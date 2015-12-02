@@ -1,3 +1,5 @@
+require 'celluloid/io'
+
 module Kubernetes
   class ClientConfigFile
     attr_reader :filepath, :api_version, :clusters, :users, :contexts
@@ -104,7 +106,8 @@ module Kubernetes
       attr_accessor :name, :cluster, :user, :api_version
 
       def client
-        Kubeclient::Client.new(cluster.url, api_version, ssl_options: ssl_options)
+        Kubeclient::Client.new(cluster.url, api_version,
+                               ssl_options: ssl_options, socket_options: socket_options)
       end
 
       def use_ssl?
@@ -120,6 +123,14 @@ module Kubernetes
           ca_file:     cluster.ca_filepath,
           verify_ssl:  OpenSSL::SSL::VERIFY_PEER
         }
+      end
+
+      def socket_options
+        if use_ssl?
+          { ssl_socket_class: Celluloid::IO::SSLSocket }
+        else
+          { socket_class: Celluloid::IO::TCPSocket }
+        end
       end
     end
   end
