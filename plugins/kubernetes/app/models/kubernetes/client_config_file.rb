@@ -118,7 +118,7 @@ module Kubernetes
           client_cert: user.client_cert,
           client_key:  user.client_key,
           ca_file:     cluster.ca_filepath,
-          verify_ssl:  OpenSSL::SSL::VERIFY_PEER
+          verify_ssl:  OpenSSL::SSL::VERIFY_NONE
         }
       end
     end
