@@ -66,11 +66,23 @@ module Kubernetes
     end
 
     def deploy_to_kubernetes
-      rc = Kubeclient::ReplicationController.new(deployment_hash)
-      client.create_replication_controller(rc)
+      deployment = Kubeclient::Deployment.new(deployment_hash)
+      # Create new client as 'Deployment' API is on different path then 'v1'
+      ext_client = deploy_group.kubernetes_cluster.ext_client
+      if previous_deploy?(ext_client, deployment)
+        ext_client.update_deployment(deployment)
+      else
+        ext_client.create_deployment(deployment)
+      end
     end
 
     private
+
+    def previous_deploy?(ext_client, deployment)
+      ext_client.get_deployment(deployment.metadata.name, deployment.metadata.namespace)
+    rescue KubeException
+      false
+    end
 
     def service_template
       @service_template ||= begin
@@ -96,11 +108,11 @@ module Kubernetes
     end
 
     def parsed_config_file
-      Kubernetes::Util.parse_file(config_template, kubernetes_role.config_file)
+      Kubernetes::Util.parse_file(raw_template, kubernetes_role.config_file)
     end
 
     def validate_config_file
-      if build && kubernetes_role && config_template.blank?
+      if build && kubernetes_role && raw_template.blank?
         errors.add(:build, "does not contain config file '#{kubernetes_role.config_file}'")
       end
     end
