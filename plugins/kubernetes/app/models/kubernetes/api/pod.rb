@@ -5,13 +5,20 @@ module Kubernetes
         @pod = api_pod
       end
 
-      def ready?
-        condition_ready?
-        # @pod.status.phase == 'Running' && condition_ready?
-      end
-
       def name
         @pod.metadata.name
+      end
+
+      def live?
+        @pod.status.phase == 'Running' && ready?
+      end
+
+      def not_ready?
+        !ready?
+      end
+
+      def phase
+        @pod.status.phase
       end
 
       def project_id
@@ -30,9 +37,11 @@ module Kubernetes
         @pod.metadata.labels.role_id.to_i
       end
 
-      private
+      def rc_unique_identifier
+        @pod.metadata.labels.rc_unique_identifier
+      end
 
-      def condition_ready?
+      def ready?
         if @pod.status.conditions.present?
           ready = @pod.status.conditions.find { |c| c['type'] == 'Ready' }
           ready && ready['status'] == 'True'

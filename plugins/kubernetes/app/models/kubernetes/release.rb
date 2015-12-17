@@ -7,6 +7,7 @@ module Kubernetes
     belongs_to :user
     belongs_to :build
     has_many :release_docs, class_name: 'Kubernetes::ReleaseDoc', foreign_key: 'kubernetes_release_id'
+    has_many :deploy_groups, through: :release_docs
 
     delegate :project, to: :build
 
@@ -22,6 +23,7 @@ module Kubernetes
       super new_status.to_s
     end
 
+    # TODO : REMOVE! WE CAN'T KNOW FOR SURE WHEN A DEPLOY IS FINISHED IF THE WATCHER DIED
     def deploy_finished!
       self.deploy_finished_at = Time.now
       save!
@@ -49,7 +51,7 @@ module Kubernetes
     end
 
     def watch
-      Watchers::DeployWatcher.new(self)
+      Watchers::DeployWatcher.new(project)
     end
 
     # Creates a new Kubernetes Release and corresponding ReleaseDocs and starts the deploy

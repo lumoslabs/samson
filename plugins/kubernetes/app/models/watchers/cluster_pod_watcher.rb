@@ -61,7 +61,7 @@ module Watchers
       debug notice.to_s
       return if handle_error(notice) || !notice.object.metadata.labels
       project_id = notice.object.metadata.labels['project_id']
-      publish("pod-events-#{project_id}", notice) if project_id
+      publish("pod-events-project-#{project_id}", notice) if project_id
     end
 
     %w{debug info warn error}.each do |level|
