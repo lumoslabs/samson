@@ -83,7 +83,7 @@ samson.controller('KubernetesDashboardCtrl',
       kubernetesService.loadDashboardData($scope.project_id, $scope.environment).then(
         function(data) {
           $scope.loadingClusterState = false;
-          if (_.isNotUndefinedOrEmpty(data)) {
+          if (_.isDefined(data)) {
             $scope.dashboard_data = data;
             deferred.resolve();
           }
@@ -166,13 +166,13 @@ samson.controller('KubernetesDashboardCtrl',
 
     function findRole(role_id) {
       return _.find($scope.dashboard_data, function(role) {
-        return role.name == role_id;
+        return role.id == role_id;
       });
     }
 
-    function findDeployGroup(role, deploy_group_name) {
+    function findDeployGroup(role, deploy_group_id) {
       return _.find(role.deploy_groups, function(deploy_group) {
-        return deploy_group.name == deploy_group_name;
+        return deploy_group.id == deploy_group_id;
       });
     }
 
