@@ -4,6 +4,8 @@ module Kubernetes
 
     include Kubernetes::DeployYaml
 
+    STATUSES = %w[created spinning_up live spinning_down dead]
+
     belongs_to :kubernetes_role, class_name: 'Kubernetes::Role'
     belongs_to :kubernetes_release, class_name: 'Kubernetes::Release'
     belongs_to :deploy_group
@@ -13,11 +15,15 @@ module Kubernetes
     validates :kubernetes_release, presence: true
     validates :replica_target, presence: true, numericality: { greater_than: 0 }
     validates :replicas_live, presence: true, numericality: { greater_than_or_equal_to: 0 }
-    validates :status, presence: true, inclusion: Kubernetes::Release::STATUSES
+    validates :status, presence: true, inclusion: STATUSES
     validate :validate_config_file, on: :create
 
-    Kubernetes::Release::STATUSES.each do |s|
+    STATUSES.each do |s|
       define_method("#{s}?") { status == s }
+    end
+
+    def status=(new_status)
+      super new_status.to_s
     end
 
     def has_service?
@@ -47,18 +53,42 @@ module Kubernetes
       kubernetes_release.try(:build)
     end
 
+    def release_doc_metadata
+      kubernetes_release.release_metadata.merge(role_id: kubernetes_role.id.to_s, deploy_group_id: deploy_group.id.to_s)
+    end
+
     def nested_error_messages
       errors.full_messages
     end
 
     def update_replica_count(new_count)
-      self.replicas_live = new_count
-
-      if replicas_live >= replica_target
-        self.status ='live'
-      elsif replicas_live > 0
-        self.status ='spinning_up'
+      if replica_target_reached?(new_count)
+        self.status = :live
+      elsif currently_spinning_up?(new_count)
+        self.status = :spinning_up
+      elsif currently_spinning_down?(new_count)
+        self.status = :spinning_down
+      elsif new_count.zero?
+        self.status = :dead
       end
+
+      self.replicas_live = new_count
+    end
+
+    def replica_target_reached?(new_count)
+      replica_target == new_count
+    end
+
+    def currently_spinning_up?(new_count)
+      new_count > replicas_live
+    end
+
+    def currently_spinning_down?(new_count)
+      new_count < replicas_live
+    end
+
+    def live_replicas_changed?(new_count)
+      new_count != replicas_live
     end
 
     def client
@@ -85,9 +115,9 @@ module Kubernetes
     end
 
     def service_template
+      # It's possible for the file to contain more than one definition,
+      # like a ReplicationController and a Service.
       @service_template ||= begin
-                              # It's possible for the file to contain more than one definition,
-                              # like a ReplicationController and a Service.
         hash = Array.wrap(parsed_config_file).detect { |doc| doc['kind'] == 'Service' }
         (hash || {}).freeze
       end

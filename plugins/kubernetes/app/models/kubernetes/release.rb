@@ -18,15 +18,19 @@ module Kubernetes
       define_method("#{s}?") { status == s }
     end
 
-    def release_is_live!
-      self.status = :live
+    def status=(new_status)
+      super new_status.to_s
+    end
+
+    def deploy_finished!
       self.deploy_finished_at = Time.now
       save!
     end
 
-    def pod_labels
+    def release_metadata
       {
-        project: build.project_name
+        release_id: id.to_s,
+        project_id: build.project.id.to_s
       }
     end
 
@@ -70,6 +74,10 @@ module Kubernetes
         end
       end
       raise 'No Kubernetes::ReleaseDoc has been created' if release_docs.empty?
+    end
+
+    def release_doc_for(deploy_group_id, role_id)
+      release_docs.find { |doc| doc.kubernetes_role.id == role_id && doc.deploy_group.id == deploy_group_id }
     end
 
     private
