@@ -31,7 +31,7 @@ class KubernetesDashboardController < ApplicationController
     release = release(deploy_group[:releases], labels.release_id, labels.role_id, deploy_group_id)
 
     api_pod = Kubernetes::Api::Pod.new(pod)
-    release[:live_replicas] += 1 if api_pod.ready?
+    release[:live_replicas] += 1 if api_pod.live?
   end
 
   def role(roles, role_id)
