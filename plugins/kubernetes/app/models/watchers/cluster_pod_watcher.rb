@@ -58,16 +58,33 @@ module Watchers
     end
 
     def handle_notice(notice)
-      debug notice.to_s
       return if handle_error(notice) || !notice.object.metadata.labels
       project_id = notice.object.metadata.labels['project_id']
-      publish("pod-events-project-#{project_id}", notice) if project_id
+      publish_notice(project_id, notice) if project_id
+    end
+
+    def publish_notice(project_id, notice)
+      log(notice)
+      publish("pod-events-project-#{project_id}", notice)
     end
 
     %w{debug info warn error}.each do |level|
       define_method level do |message|
         super "#{name} -> #{message}"
       end
+    end
+
+    def log(notice)
+      pod = RecursiveOpenStruct.new(notice.object)
+      debug("Received Event: #{{
+        type: notice.type,
+        project: pod.metadata.labels.project_id,
+        role: pod.metadata.labels.role_id,
+        deploy_group: pod.metadata.labels.deploy_group_id,
+        release: pod.metadata.labels.release_id,
+        phase: pod.status.phase,
+        ready: pod.status.conditions ? OpenStruct.new(pod.status.conditions.find { |c| c['type'] == 'Ready' }).status : ''
+      }.to_json}")
     end
   end
 end

@@ -54,6 +54,10 @@ Project.class_eval do
     name.parameterize('-')
   end
 
+  def deploy_watcher_actor_name
+    "deploy-watcher-#{id}"
+  end
+
   private
 
   # Given a list of kubernetes configuration files, retrieves the corresponding contents

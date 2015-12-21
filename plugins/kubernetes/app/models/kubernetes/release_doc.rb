@@ -61,30 +61,31 @@ module Kubernetes
       errors.full_messages
     end
 
-    def update_replica_count(new_count)
-      if replica_target_reached?(new_count)
+    def update_release_progress(live_pods)
+      update_status(live_pods)
+      update_replica_count(live_pods)
+      save!
+
+      kubernetes_release.update_status(self)
+    end
+
+    def update_status(live_pods)
+      case
+      when replica_target == live_pods then
         self.status = :live
-      elsif currently_spinning_up?(new_count)
-        self.status = :spinning_up
-      elsif currently_spinning_down?(new_count)
-        self.status = :spinning_down
-      elsif new_count.zero?
+      when live_pods.zero? then
         self.status = :dead
+      when live_pods > replicas_live then
+        self.status = :spinning_up
+      when live_pods < replicas_live then
+        self.status = :spinning_down
+      else
+        Rails.logger.debug("ReleaseDoc status did not change. Current: #{self.status}")
       end
+    end
 
+    def update_replica_count(new_count)
       self.replicas_live = new_count
-    end
-
-    def replica_target_reached?(new_count)
-      replica_target == new_count
-    end
-
-    def currently_spinning_up?(new_count)
-      new_count > replicas_live
-    end
-
-    def currently_spinning_down?(new_count)
-      new_count < replicas_live
     end
 
     def live_replicas_changed?(new_count)
