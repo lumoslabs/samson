@@ -13,10 +13,6 @@ module Kubernetes
         @pod.status.phase == 'Running' && ready?
       end
 
-      def not_ready?
-        !ready?
-      end
-
       def phase
         @pod.status.phase
       end

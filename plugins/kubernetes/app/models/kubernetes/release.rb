@@ -19,11 +19,14 @@ module Kubernetes
       define_method("#{s}?") { status == s }
     end
 
+    scope :not_dead, -> { where.not(status: :dead) }
+    scope :excluding, ->(ids) { where.not(id: ids) }
+    scope :with_not_dead_release_docs, -> { joins(:release_docs).where.not(Kubernetes::ReleaseDoc.table_name => { status: :dead }) }
+
     def status=(new_status)
       super new_status.to_s
     end
 
-    # TODO : REMOVE! WE CAN'T KNOW FOR SURE WHEN A DEPLOY IS FINISHED IF THE WATCHER DIED
     def deploy_finished!
       self.deploy_finished_at = Time.now
       save!
@@ -50,19 +53,12 @@ module Kubernetes
       end
     end
 
-    def watch
-      Watchers::DeployWatcher.new(project)
-    end
-
-    # Creates a new Kubernetes Release and corresponding ReleaseDocs and starts the deploy
+    # Creates a new Kubernetes Release and corresponding ReleaseDocs
     def self.create_release(params)
       Kubernetes::Release.transaction do
         release = create(params.except(:deploy_groups))
         if release.persisted?
           release.create_release_docs(params)
-
-          # Starts rolling out the release into Kubernetes
-          KuberDeployService.new(release).deploy!
         end
         release
       end
@@ -80,6 +76,23 @@ module Kubernetes
 
     def release_doc_for(deploy_group_id, role_id)
       release_docs.find { |doc| doc.kubernetes_role.id == role_id && doc.deploy_group.id == deploy_group_id }
+    end
+
+    def update_status(release_doc)
+      case
+      when release_docs.all?(&:live?) then
+        self.status = :live
+      when release_doc.spinning_up? then
+        self.status = :spinning_up
+      when release_doc.spinning_down? then
+        self.status = :spinning_down
+      when release_docs.all?(&:dead?) then
+        self.status = :dead
+      else
+        Rails.logger.debug("Release status did not change. Current: #{self.status}")
+      end
+
+      save!
     end
 
     private
