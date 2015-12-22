@@ -36,7 +36,7 @@ Project.class_eval do
           roles.create!(
             config_file: config_file.file_path,
             name: config_file.deployment.metadata.labels.role,
-            service_name: config_file.service.name,
+            service_name: config_file.service.metadata.name,
             ram: config_file.deployment.ram_mi,
             cpu: config_file.deployment.cpu_m,
             replicas: config_file.deployment.spec.replicas,

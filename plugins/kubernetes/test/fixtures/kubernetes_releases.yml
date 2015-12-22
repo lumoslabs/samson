@@ -1,3 +1,11 @@
+test_release:
+  user: deployer
+  build: docker_build
+
+second_test_release:
+  user: deployer
+  build: docker_build
+
 test_release_deploying:
   user: deployer
   build: docker_build
@@ -7,9 +15,5 @@ test_prod_release_deploying:
   build: docker_build
 
 test_release_complete:
-  user: deployer
-  build: docker_build
-
-second_test_release:
   user: deployer
   build: docker_build

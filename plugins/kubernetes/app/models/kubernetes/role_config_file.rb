@@ -1,14 +1,7 @@
 module Kubernetes
 
   # This file represents a Kubernetes configuration file for a specific project role.
-  # A single configuration file can have both a Replication Controller and a Service, as two separate documents.
-  #
-  # For the schema definition of a Replication Controller see:
-  # https://cloud.google.com/container-engine/docs/replicationcontrollers/operations
-  #
-  # For the schema definition of a Service, see:
-  # https://cloud.google.com/container-engine/docs/services/operations
-  #
+  # A single configuration file can have both a Delpoyment spec and a Service spec, as two separate documents.
   class RoleConfigFile
     attr_reader :file_path, :deployment, :service
 
@@ -21,11 +14,11 @@ module Kubernetes
     private
 
     def parse_file
-      parse_replication_controller
+      parse_deployment
       parse_service
     end
 
-    def parse_replication_controller
+    def parse_deployment
       deployment_hash = as_hash('Deployment')
       raise 'Deployment specification missing in the configuration file.' if deployment_hash.nil?
       @deployment = Deployment.new(deployment_hash, :recurse_over_arrays => true)
@@ -36,7 +29,10 @@ module Kubernetes
 
     def parse_service
       service_hash = as_hash('Service')
-      @service = Service.new(service_hash) unless service_hash.nil?
+      @service = Service.new(service_hash, :recurse_over_arrays => true) unless service_hash.nil?
+    rescue => ex
+      Rails.logger.error "Deployment YAML '#{file_path}' invalid: #{ex.message}"
+      raise ex
     end
 
     def as_hash(type)
@@ -71,37 +67,7 @@ module Kubernetes
       end
     end
 
-    class Service
-
-      def initialize(service_hash)
-        @service_hash = service_hash
-      end
-
-      def name
-        metadata[:name]
-      end
-
-      def labels
-        metadata[:labels]
-      end
-
-      def selector
-        spec[:selector]
-      end
-
-      def type
-        spec[:type]
-      end
-
-      private
-
-      def metadata
-        @service_hash[:metadata]
-      end
-
-      def spec
-        @service_hash[:spec]
-      end
+    class Service < RecursiveOpenStruct
     end
   end
 end
