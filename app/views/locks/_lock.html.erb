@@ -4,5 +4,12 @@
   <% else %>
     <%= lock_icon %> Deployments to <%= lock.global? ? "ALL STAGES" : "this stage" %> were locked
   <% end %>
-  <%= lock.reason %> by <%= lock.user.name %> <%= time_ago_in_words(lock.created_at) %> ago.
+  <%= lock.reason %> by <%= lock.user.name %> <%= time_ago_in_words(lock.created_at) %>
+
+  <% if lock.delete_at %>
+    ago and will unlock in <%= time_ago_in_words(lock.delete_at) %>.
+  <% else %>
+      ago.
+  <% end %>
+
 </div>

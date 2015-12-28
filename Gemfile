@@ -29,6 +29,8 @@ gem 'active_model_serializers', '~> 0.8.0'
 gem 'sawyer', '~> 0.5'
 gem 'sse-rails-engine', '~> 1.4'
 
+gem 'concurrent-ruby', require: 'concurrent'
+
 # Logging
 gem 'lograge'
 gem 'logstash-event'
