@@ -108,7 +108,8 @@ class Project < ActiveRecord::Base
   end
 
   def repository
-    @repository ||= GitRepository.new(repository_url: repository_url, repository_dir: repository_directory)
+    authed_repository_url = repository_url.sub("https://", "https://#{ENV['GITHUB_TOKEN']}@")
+    @repository ||= GitRepository.new(repository_url: authed_repository_url, repository_dir: repository_directory)
   end
 
   def with_lock(output: StringIO.new, holder:, error_callback: nil, timeout: 10.minutes, &block)
