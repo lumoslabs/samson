@@ -1,6 +1,7 @@
+require 'concurrent'
+
 module Samson::Tasks
   class LockCleaner
-
     def self.start
       new.start
     end
@@ -16,10 +17,11 @@ module Samson::Tasks
     end
 
     # called by Concurrent::TimerTask
-    def update(time, result, ex)
-      if ex
-        Rails.logger.error "(#{time}) Samson::Tasks::LockCleaner failed with error #{ex}\n"
-        Rails.logger.error ex.backtrace.join("\n")
+    def update(time, result, exception)
+      if exception
+        Rails.logger.error "(#{time})  with error #{exception}"
+        Rails.logger.error exception.backtrace.join("\n")
+        Airbrake.notify(exception, error_message: "Samson::Tasks::LockCleaner failed")
       end
     end
   end

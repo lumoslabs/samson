@@ -4,9 +4,8 @@ describe Samson::Tasks::LockCleaner do
   subject { Samson::Tasks::LockCleaner.new }
 
   describe "#start" do
-    before { Concurrent::TimerTask.any_instance.expects(:execute).once }
-
     it "starts the timer task" do
+      subject.task.expects(:execute).once
       subject.start
     end
   end
@@ -30,11 +29,13 @@ describe Samson::Tasks::LockCleaner do
 
     it "does nothing without an exception" do
       Rails.logger.expects(:error).never
+      Airbrake.expects(:notify).never
       subject.update(Time.now, nil, nil)
     end
 
     it "logs when given an exception" do
       Rails.logger.expects(:error).twice
+      Airbrake.expects(:notify).with(exp, { error_message: 'Samson::Tasks::LockCleaner failed' }).once
       subject.update(Time.now, nil, exp)
     end
   end

@@ -21,9 +21,15 @@ class Lock < ActiveRecord::Base
   end
 
   def summary
-    unlock = " and will unlock in #{time_ago_in_words(delete_at)}" if delete_at
+    "Locked by #{locked_by} #{time_ago_in_words(created_at)} ago#{unlock_at}"
+  end
 
-    "Locked by #{user.try(:name) || 'Unknown user'} #{time_ago_in_words(created_at)} ago#{unlock}"
+  def locked_by
+    "#{user.try(:name) || 'Unknown user'}"
+  end
+
+  def unlock_at
+    " and will unlock in #{time_ago_in_words(delete_at)}" if delete_at
   end
 
   def reason
@@ -31,7 +37,7 @@ class Lock < ActiveRecord::Base
   end
 
   def self.remove_expired_locks
-    Lock.where("delete_at IS NOT NULL and delete_at < CURRENT_TIMESTAMP").find_each(&:soft_delete)
+    Lock.where("delete_at IS NOT NULL and delete_at < CURRENT_TIMESTAMP").find_each(&:soft_delete!)
   end
 
   def delete_in=(seconds)

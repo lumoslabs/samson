@@ -29,8 +29,6 @@ gem 'active_model_serializers', '~> 0.8.0'
 gem 'sawyer', '~> 0.5'
 gem 'sse-rails-engine', '~> 1.4'
 
-gem 'concurrent-ruby', require: 'concurrent'
-
 # Logging
 gem 'lograge'
 gem 'logstash-event'
@@ -92,6 +90,8 @@ group :no_preload do
   gem 'coderay', '~> 1.1.0'
   gem 'dogapi', '~> 1.9'
   gem 'net-http-persistent'
+  gem 'concurrent-ruby'
+
   Dir[File.join(Bundler.root, 'plugins/*/')].each { |f| gemspec path: f, require: false } # treat included plugins like gems
 end
 

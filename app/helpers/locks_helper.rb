@@ -1,6 +1,6 @@
 module LocksHelper
   def delete_lock_options
-    offsets = [
+    [
       ['Unlock in 1 hour', 1.hour],
       ['Unlock in 2 hours', 2.hours],
       ['Unlock in 4 hours', 4.hours],

@@ -56,7 +56,7 @@ describe Lock do
 
     it "sets delete_at when given an offset" do
       lock = Lock.new(delete_in: 1.hour)
-      lock.delete_at.to_time.must_equal(Time.now + 1.hour)
+      lock.delete_at.must_equal(Time.now + 1.hour)
     end
 
     it "sets delete_at to nil when given nil" do
@@ -72,32 +72,26 @@ describe Lock do
 
   describe 'remove_expired_locks' do
     before do
-      create_some_locks
+      expired = 2.hour.ago
+      Lock.create!(user: users(:deployer), stage: stages(:test_staging), created_at: expired, delete_in: 3600)
+      Lock.create!(user: users(:deployer), stage: stages(:test_production), created_at: expired, delete_in: 3600)
+      Lock.create!(user: users(:deployer), stage: stages(:test_staging), delete_in: 3600)
+      Lock.create!(user: users(:deployer), stage: stages(:test_production), delete_in: 3600)
+      Lock.create!(user: users(:deployer), stage: stages(:test_production_pod))
+
       Lock.remove_expired_locks
     end
 
     it "removes expired locks" do
-      assert_empty Lock.where("delete_at < ?", Time.now)
+      Lock.where("delete_at < ?", Time.now).must_be_empty
     end
 
     it "leaves unexpired locks alone" do
-      refute_empty Lock.where("delete_at > ?", Time.now)
+      Lock.where("delete_at > ?", Time.now).wont_be_empty
     end
 
     it "leaves indefinite locks alone" do
-      refute_empty Lock.where("delete_at is null")
+      Lock.where("delete_at is null").wont_be_empty
     end
-  end
-
-  def create_some_locks
-    expired = 2.hour.ago
-
-    Lock.create!(user: users(:deployer), stage: stages(:test_staging), created_at: expired, delete_in: 3600)
-    Lock.create!(user: users(:deployer), stage: stages(:test_production), created_at: expired, delete_in: 3600)
-
-    Lock.create!(user: users(:deployer), stage: stages(:test_staging), delete_in: 3600)
-    Lock.create!(user: users(:deployer), stage: stages(:test_production), delete_in: 3600)
-
-    Lock.create!(user: users(:deployer), stage: stages(:test_production_pod))
   end
 end
