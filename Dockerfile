@@ -32,6 +32,10 @@ ADD config/database.mysql.yml.example /app/config/database.yml
 ADD app /app/app
 ADD lib /app/lib
 
+# precompile assets
+RUN PRECOMPILE=1 bundle exec rake assets:clean --trace
+RUN PRECOMPILE=1 bundle exec rake assets:precompile --trace
+
 EXPOSE 9080
 
 CMD ["bundle", "exec", "puma", "-C", "./config/puma.rb"]
