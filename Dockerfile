@@ -13,7 +13,7 @@ ADD Rakefile /app/
 ADD bin /app/bin
 ADD public /app/public
 ADD db /app/db
-ADD .env.bootstrap /app/.env
+# deviation from main samson repo here. Do NOT copy the bootstrap ENV
 
 # NPM
 ADD package.json /app/package.json
@@ -28,6 +28,7 @@ RUN bundle install --quiet --local --jobs 4 || bundle check
 
 # Code
 ADD config /app/config
+ADD config/database.mysql.yml.example /app/config/database.yml
 ADD app /app/app
 ADD lib /app/lib
 
