@@ -1,0 +1,14 @@
+app:
+  build: .
+  env_file: '.env'
+  ports:
+    - "9080:9080"
+  links:
+    - mysql
+
+mysql:
+  image: mysql:5.6
+  volumes:
+    - samson-mysql-data:/var/lib/mysql
+  environment:
+    - "MYSQL_ROOT_PASSWORD=password"
