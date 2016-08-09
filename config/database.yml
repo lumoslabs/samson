@@ -1,0 +1,19 @@
+shared: &shared
+  adapter: mysql2
+  username: <%= ENV['MYSQL_USERNAME'] %>
+  password: <%= ENV['MYSQL_PASSWORD'] %>
+  host: <%= ENV['MYSQL_HOST'] %>
+  database: <%= ENV['MYSQL_DATABASE'] %>
+  encoding: utf8
+
+development:
+  <<: *shared
+
+test:
+  <<: *shared
+
+staging:
+  <<: *shared
+
+production:
+  <<: *shared

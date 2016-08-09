@@ -6,7 +6,7 @@
 
 # Ignore bundler config.
 /.bundle
-/.env
+/.env*
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
@@ -16,9 +16,6 @@
 /log/*.log
 /log/*.log.json
 /tmp
-
-# Ignore config
-/config/database.yml
 
 /node_modules
 

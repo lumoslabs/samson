@@ -1,6 +1,6 @@
 app:
   build: .
-  env_file: '.env'
+  env_file: '.env.production'
   ports:
     - "9080:9080"
   links:

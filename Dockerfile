@@ -33,6 +33,8 @@ COPY config /app/config
 COPY app /app/app
 COPY lib /app/lib
 
+RUN PRECOMPILE=1 bundle exec rake --trace assets:clean assets:precompile
+
 EXPOSE 9080
 
 CMD ["bundle", "exec", "puma", "-C", "./config/puma.rb"]
