@@ -69,7 +69,7 @@ class TerminalExecutor
         if RbConfig::CONFIG["target_os"].include?("darwin")
           "script -q /dev/null sh #{f.path}"
         else
-          "script -qfec 'sh #{f.path}'"
+          "script -qfc 'sh #{f.path}'"
         end
 
       Open3.popen2e(whitelisted_env, script, options) do |_stdin, oe, wait_thr|
