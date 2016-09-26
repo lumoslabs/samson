@@ -76,6 +76,13 @@ class GitRepository
     output.split("\n")
   end
 
+  def current_branch(git_reference)
+    return unless ensure_local_cache!
+    return '' unless output = capture_stdout('git', 'name-rev', '--name-only', git_reference)
+    output = File.basename output
+    output.strip.sub(/~\d*$/, '')
+  end
+
   def clean!
     FileUtils.rm_rf(repo_cache_dir)
   end

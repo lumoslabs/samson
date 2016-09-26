@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+APP_ROOT=/home/lumoslabs/samson
+
+stop_samson() {
+  pid=$(pgrep samson)
+  test -z "$pid" && pid=$(pgrep -f puma)
+  test -z "$pid" && {
+    echo "samson not running" >&2
+    return 0
+  }
+  echo "stopping samson (pid=$pid)"
+  kill -s SIGTERM ${pid}
+  wait ${pid}
+}
+
+start_smason() {
+  pushd "${APP_ROOT}" 2>&1 >/dev/null
+  (export RAILS_ENV=production; exec -a samson bundle exec puma -C config/puma.rb) &
+}
+
+case "$1" in
+  start) start_samson ;;
+  stop) stop_samson ;;
+  restart) stop_samson ; sleep 2 ; start_samson ;;
+esac

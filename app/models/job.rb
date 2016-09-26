@@ -106,8 +106,8 @@ class Job < ActiveRecord::Base
     update_attribute(:output, output)
   end
 
-  def update_git_references!(commit:, tag:)
-    update_columns(commit: commit, tag: tag)
+  def update_git_references!(commit:, tag:, branch:)
+    update_columns(commit: commit, tag: tag, branch: branch)
   end
 
   def url

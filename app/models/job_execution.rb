@@ -180,8 +180,9 @@ class JobExecution
     @repository.update_local_cache!
     commit = @repository.commit_from_ref(@reference)
     tag = @repository.tag_from_ref(@reference)
+    branch = @repository.current_branch(@reference)
     if commit
-      @job.update_git_references!(commit: commit, tag: tag)
+      @job.update_git_references!(commit: commit, tag: tag, branch: branch)
       @output.puts("Commit: #{commit}")
       true
     else
@@ -201,6 +202,7 @@ class JobExecution
       PROJECT_REPOSITORY: @job.project.repository_url,
       REFERENCE: @reference,
       REVISION: @job.commit,
+      BRANCH: @job.branch,
       TAG: (@job.tag || @job.commit),
       CACHE_DIR: artifact_cache_dir
     }.merge(@env)
