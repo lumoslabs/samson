@@ -1,0 +1,112 @@
+#!/bin/bash
+set -e
+
+help() {
+  rc=${1:-0}
+  msg=${2:-"Kubernetes Samson Deploy - Use this to deploy things to k8s in samson"}
+  cat >&2 <<-EOF
+
+	${msg}
+
+	USAGE: $0 -e ENVIRONMENT [-a APP] [-n NAMESPACE] [-p PATH_TO_CODE]
+
+	OPTIONS:
+	  -h  This help
+	  -e  Environment (Required)
+	  -a  App name (Default: \$PROJECT_NAME)
+	  -n  K8s Namespace (Default: \$DEPLOY_GROUPS)
+	  -p  Path to codebase (Default: \$PWD)
+EOF
+  exit ${rc}
+}
+
+# Options
+options=":e:a:n:p:h"
+while getopts "${options}" opt; do
+  case "${opt}" in
+    \?) echo "Unrecognized option, ignoring: `${OPTARG}`" >&2 ;;
+    :) echo "Option `${OPTARG}` requires an argument!" >&2 ; exit 1 ;;
+    a) APP=${OPTARG} ;;
+    e) ENVIRONMENT=${OPTARG} ;;
+    n) NAMESPACE=${OPTARG} ;;
+    h) help 1 ;;
+  esac
+done
+test -z "${ENVIRONMENT}" && help 2 "[ERR] Environment is required." 
+test -z "${APP}" && APP=${PROJECT_NAME}
+test -z "${NAMESPACE}" && NAMESPACE=${DEPLOY_GROUPS}
+export APP ENVIRONMENT NAMESPACE
+
+# Commands
+kc="/usr/local/bin/kubectl --kubeconfig=/opt/kubernetes/config --context=${ENVIRONMENT}"
+kcn="$kc --namespace=${NAMESPACE}"
+memory="/opt/rbenv/shims/knife-memory --secret_file=/home/lumoslabs/.chef/encrypted_data_bag_secret"
+
+
+# Functions
+memory_env_dump() {
+  echo "----> Dumping data bag item ${APP}-${ENVIRONMENT} as .env.${ENVIRONMENT}"
+  RBENV_VERSION=2.1.6 $memory env dump "${ENVIRONMENT}" "${APP}" ".env.${ENVIRONMENT}"
+  echo "----> Dumping quay.io config"
+  RBENV_VERSION=2.1.6 $memory env dump operations quay .env.quayconfig
+  echo "----> Dumping dockerhub config"
+  RBENV_VERSION=2.1.6 $memory env dump operations dockerhub .env.dockerconfig
+}
+
+create_namespace() {
+  echo "----> Creating namespace ${NAMESPACE}"
+  $kc create namespace ${NAMESPACE} --save-config=true --dry-run=true --output=yaml | \
+    $kc apply --record=true --filename=-
+}
+
+create_image_pull_secrets() {
+  echo "----> Creating quay.io authentication secrets"
+  (
+    unset EMAIL_ADDRESS PASSWORD USERNAME
+    sed -r -i '/EMAIL|PASSWORD|USERNAME/!d' .env.quayconfig
+    set -a ; source .env.quayconfig ; set +a
+    $kcn create secret docker-registry quay \
+      --docker-server=quay.io --docker-email="${EMAIL_ADDRESS}" \
+      --docker-username="${USERNAME}" --docker-password="${PASSWORD}" \
+      --dry-run=true --save-config=true --output=yaml | \
+      $kcn apply --record=true --filename=-
+  )
+  echo "----> Creating dockerhub authentication secrets"
+  (
+    unset EMAIL PASSWORD USERNAME
+    sed -r -i '/EMAIL2|USERNAME2|PASSWORD2/d' .env.dockerconfig
+    sed -r -i '/EMAIL|USERNAME|PASSWORD/!d' .env.quayconfig
+    set -a ; source .env.dockerconfig ; set +a
+    $kcn create secret docker-registry dockerhub \
+      --docker-server=quay.io --docker-email="${EMAIL}" \
+      --docker-username="${USERNAME}" --docker-password="${PASSWORD}" \
+      --dry-run=true --save-config=true --output=yaml | \
+      $kcn apply --record=true --filename=-
+  )
+}
+
+create_app_configmap() {
+  echo "----> Creating ${APP}-${ENVIRONMENT}-config configmap"
+  $kcn create configmap ${APP}-${BRANCH}-config --from-file=.env.staging --save-config=true --dry-run=true --output=yaml | \
+    $kcn apply --record=true --filename=-
+}
+
+deploy_app() {
+  echo "----> Generating kubernetes resource files from templates"
+  /usr/local/bin/t2 --force-tmp --tmpdir="${PWD}/out" kubernetes/templates
+  echo "----> Deploying ${APP}"
+  $kcn apply --record=true --filename="${PWD}/out"
+}
+
+main() {
+  echo "----> Deploying ${APP} ${ENVIRONMENT} to kubernetes-${ENVIRONMENT}"
+  memory_env_dump
+  create_namespace
+  create_image_pull_secrets
+  create_app_configmap
+  deploy_app
+  timeout 5m $kcn rollout status deployment ${APP}
+}
+
+main
+
