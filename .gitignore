@@ -15,6 +15,8 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /log/*.log.json
+log/*.log.1
+/log/*.gz
 /tmp
 typescript
 
