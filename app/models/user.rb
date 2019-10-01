@@ -116,8 +116,9 @@ class User < ActiveRecord::Base
     admin? || !!project_role_for(project)&.admin?
   end
 
-  def deployer_for?(project, environment = nil)
-    (deployer? || !!project_role_for(project)&.deployer?) && can_deploy_in_environment?(environment)
+  def deployer_for?(project, environments = nil)
+    # binding.pry
+    (deployer? || !!project_role_for(project)&.deployer?) && can_deploy_in_environments?(environments)
   end
 
   def project_role_for(project)
@@ -126,10 +127,12 @@ class User < ActiveRecord::Base
 
   private
 
-  def can_deploy_in_environment?(environment)
-    return true unless environment
-    return true unless uer = user_environment_roles.find_by(environment: environment)
-    uer.deployer?
+  def can_deploy_in_environments?(environments)
+    environments.all? do |environment|
+      return true unless environment
+      return true unless uer = user_environment_roles.find_by(environment: environment)
+      uer.deployer?
+    end
   end
 
   def destroy_user_project_roles
