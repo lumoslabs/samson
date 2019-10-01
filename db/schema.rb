@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(version: 2019_09_27_195246) do
     t.integer "deploy_group_id"
     t.decimal "limits_cpu", precision: 6, scale: 2, null: false
     t.integer "limits_memory", null: false
-    t.text "resource_template", limit: 4294967295
+    t.text "resource_template", limit: 1073741823
     t.decimal "requests_cpu", precision: 6, scale: 2, null: false
     t.integer "requests_memory", null: false
     t.boolean "delete_resource", default: false, null: false

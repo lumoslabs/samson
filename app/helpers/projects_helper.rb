@@ -30,10 +30,6 @@ module ProjectsHelper
     current_user.admin_for?(@project)
   end
 
-  def deployer_for_stage?(stage)
-    current_user.deployer_for?(@project, stage.environments)
-  end
-
   def deployer_for_project?
     current_user.deployer_for?(@project)
   end

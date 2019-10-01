@@ -34,7 +34,6 @@ class User < ActiveRecord::Base
   validates :github_username, uniqueness: {case_sensitive: false}, format: GITHUB_USERNAME_REGEX, allow_blank: true
 
   before_soft_delete :destroy_user_project_roles
-  #TODO: Implement this
   before_soft_delete :destroy_user_environment_roles
 
   scope :search, ->(query) {
@@ -117,7 +116,6 @@ class User < ActiveRecord::Base
   end
 
   def deployer_for?(project, environments = nil)
-    # binding.pry
     (deployer? || !!project_role_for(project)&.deployer?) && can_deploy_in_environments?(environments)
   end
 
@@ -128,14 +126,20 @@ class User < ActiveRecord::Base
   private
 
   def can_deploy_in_environments?(environments)
+    return true unless environments
     environments.all? do |environment|
-      return true unless environment
-      return true unless uer = user_environment_roles.find_by(environment: environment)
-      uer.deployer?
+      uer = user_environment_roles.find_by(environment: environment)
+      !uer || uer.deployer?
     end
   end
 
   def destroy_user_project_roles
     user_project_roles.each(&:destroy)
   end
+
+
+  def destroy_user_environment_roles
+    user_environment_roles.each(&:destroy)
+  end
+
 end

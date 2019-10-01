@@ -256,20 +256,20 @@ describe User do
     end
 
     it "filters everything when asking for a unreachable role" do
-      User.with_role(Role::SUPER_ADMIN.id + 1, project.id).size.must_equal 0
+      User.with_role(Role::SUPER_ADMIN.id + 1, project.id, :project).size.must_equal 0
     end
 
     it "filters nothing when asking for anything" do
-      User.with_role(Role::VIEWER.id, project.id).size.must_equal User.count
+      User.with_role(Role::VIEWER.id, project.id, :project).size.must_equal User.count
     end
 
     it 'filters by deployer' do
-      User.with_role(Role::DEPLOYER.id, project.id).map(&:name).sort.must_equal \
+      User.with_role(Role::DEPLOYER.id, project.id, :project).map(&:name).sort.must_equal \
         deployer_list
     end
 
     it 'filters by admin' do
-      User.with_role(Role::ADMIN.id, project.id).map(&:name).sort.must_equal \
+      User.with_role(Role::ADMIN.id, project.id, :project).map(&:name).sort.must_equal \
         ["Admin", "Deployer Project Admin", "Super Admin"]
     end
 
@@ -284,13 +284,13 @@ describe User do
 
       it 'does not show duplicate when multiple roles exist' do
         UserProjectRole.create!(user: users(:project_admin), project: other, role_id: Role::ADMIN.id)
-        User.with_role(Role::DEPLOYER.id, project.id).map(&:name).sort.must_equal \
+        User.with_role(Role::DEPLOYER.id, project.id, :project).map(&:name).sort.must_equal \
           deployer_list
       end
 
       it 'shows users that only have a role on different projects' do
         UserProjectRole.create!(user: users(:deployer), project: other, role_id: Role::ADMIN.id)
-        User.with_role(Role::DEPLOYER.id, project.id).map(&:name).sort.must_equal \
+        User.with_role(Role::DEPLOYER.id, project.id, :project).map(&:name).sort.must_equal \
           deployer_list
       end
     end
