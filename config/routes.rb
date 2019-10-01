@@ -50,7 +50,7 @@ Samson::Application.routes.draw do
     resources :webhooks, only: [:index, :create, :update, :destroy]
     resources :outbound_webhooks, only: [:index, :create, :update, :destroy]
     resources :references, only: [:index]
-    resources :user_environment_roles, only: [:index]
+    resources :user_project_roles, only: [:index]
 
     member do
       get :deploy_group_versions
