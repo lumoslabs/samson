@@ -14,6 +14,7 @@ class UserProjectRolesController < ApplicationController
       page: params[:page],
       items: 15
     )
+
     @users = @users.select('users.*, user_project_roles.role_id AS user_project_role_id') # avoid breaking joins
 
     respond_to do |format|

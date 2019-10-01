@@ -4,7 +4,7 @@ class EnvironmentsController < ResourceController
   before_action :set_resource, only: [:show, :update, :destroy, :new, :create]
 
   def new
-    super(template: :show)
+    super(template: :new)
   end
 
   def create

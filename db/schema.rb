@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_27_154835) do
+ActiveRecord::Schema.define(version: 2019_09_27_195246) do
 
   create_table "audits" do |t|
     t.integer "auditable_id", null: false
@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(version: 2019_06_27_154835) do
     t.integer "deploy_group_id"
     t.decimal "limits_cpu", precision: 6, scale: 2, null: false
     t.integer "limits_memory", null: false
-    t.text "resource_template", limit: 1073741823
+    t.text "resource_template", limit: 4294967295
     t.decimal "requests_cpu", precision: 6, scale: 2, null: false
     t.integer "requests_memory", null: false
     t.boolean "delete_resource", default: false, null: false
@@ -581,6 +581,16 @@ ActiveRecord::Schema.define(version: 2019_06_27_154835) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["user_id", "project_id"], name: "index_stars_on_user_id_and_project_id", unique: true
+  end
+
+  create_table "user_environment_roles" do |t|
+    t.bigint "environment_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "role_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["environment_id"], name: "index_user_environment_roles_on_environment_id"
+    t.index ["user_id"], name: "index_user_environment_roles_on_user_id"
   end
 
   create_table "user_project_roles", id: :integer do |t|

@@ -1,0 +1,9 @@
+<ul class="nav nav-tabs">
+  <li class="<%= 'active' if active == 'environment' %>">
+    <%= link_to "Edit Environment", environment %>
+  </li>
+
+  <li class="<%= 'active' if active == 'user_environment_roles' %>">
+    <%= link_to icon_tag('user'), environment_user_environment_roles_path(environment) %>
+  </li>
+</ul>

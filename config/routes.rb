@@ -50,7 +50,7 @@ Samson::Application.routes.draw do
     resources :webhooks, only: [:index, :create, :update, :destroy]
     resources :outbound_webhooks, only: [:index, :create, :update, :destroy]
     resources :references, only: [:index]
-    resources :user_project_roles, only: [:index]
+    resources :user_environment_roles, only: [:index]
 
     member do
       get :deploy_group_versions
@@ -58,6 +58,7 @@ Samson::Application.routes.draw do
   end
 
   resources :user_project_roles, only: [:index, :create]
+  resources :user_environment_roles, only: [:index, :create]
   resources :locks, only: [:index, :create, :destroy]
 
   resources :deploys, only: [:index] do
@@ -75,7 +76,9 @@ Samson::Application.routes.draw do
 
   resources :access_tokens, only: [:index, :new, :create, :destroy]
 
-  resources :environments, except: [:edit]
+  resources :environments, except: [:edit] do
+    resources :user_environment_roles, only: [:index]
+  end
 
   resources :audits, only: [:index, :show]
 

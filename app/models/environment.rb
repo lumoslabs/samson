@@ -8,6 +8,8 @@ class Environment < ActiveRecord::Base
   include SoftDeleteWithDestroy
 
   has_many :deploy_groups, dependent: :destroy
+  has_many :user_environment_roles, dependent: :destroy
+  has_many :users, through: :user_environment_roles, inverse_of: :environments
   has_many :template_stages, -> { where(is_template: true) },
     through: :deploy_groups, class_name: 'Stage', inverse_of: nil
 

@@ -1,3 +1,4 @@
+require 'pry'
 # frozen_string_literal: true
 class AccessControl
   class << self
@@ -25,7 +26,7 @@ class AccessControl
           end
         else raise ArgumentError, "Unsupported action #{action}"
         end
-      when :projects, :build_commands, :stages, :user_project_roles
+      when :projects, :build_commands, :stages, :user_project_roles, :user_environment_roles
         case action
         when :read then true
         when :write then user.admin_for?(scope)
@@ -61,6 +62,7 @@ class AccessControl
     private
 
     def can_deploy_anything?(user)
+      # TODO: Add to this?
       user.deployer? || user.user_project_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?
     end
 
