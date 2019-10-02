@@ -2,6 +2,7 @@
 ENV["RAILS_ENV"] = "test"
 
 require 'bundler/setup'
+require 'pry'
 
 # anything loaded before coverage will be uncovered
 require 'single_cov'
@@ -18,7 +19,7 @@ require 'minitest/rails'
 require 'rails-controller-testing'
 Rails::Controller::Testing.install
 require 'maxitest/autorun'
-require 'maxitest/timeout'
+# require 'maxitest/timeout'
 require 'maxitest/threads'
 require 'webmock/minitest'
 require 'mocha/setup'

@@ -127,6 +127,7 @@ class User < ActiveRecord::Base
 
   def can_deploy_in_environments?(environments)
     return true unless environments
+    environments = [environments] unless environments.is_a? Enumerable
     environments.all? do |environment|
       uer = user_environment_roles.find_by(environment: environment)
       !uer || uer.deployer?

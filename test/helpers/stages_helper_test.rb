@@ -28,5 +28,14 @@ describe StagesHelper do
       stage_template_icon.must_include "glyphicon-duplicate"
     end
   end
+
+  describe "#deployer_for_stage?" do
+    let(:current_user) { users(:deployer) }
+
+    it "works" do
+      @project = projects(:test)
+      deployer_for_stage?(stages(:test_staging)).must_equal true
+    end
+  end
 end
 # rubocop:enable Metrics/LineLength

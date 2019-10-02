@@ -58,3 +58,24 @@ project_deployer:
   role_id: <%= Role::VIEWER.id %>
   external_id: 'github-5'
   <<: *DEFAULTS
+
+environment_limited_project_deployer:
+  name: "Environment Limited Project Deployer"
+  email: "viewer_deployer_limited@example.com"
+  role_id: <%= Role::DEPLOYER.id %>
+  external_id: 'github-5'
+  <<: *DEFAULTS
+
+environment_limited_viewer:
+  name: "Environment Limited Viewer"
+  email: "viewer_limited@example.com"
+  role_id: <%= Role::VIEWER.id %>
+  external_id: 'google-3'
+  <<: *DEFAULTS
+
+environment_limited_deployer:
+  name: "Environment Limited Deployer"
+  email: "deployer_limited@example.com"
+  role_id: <%= Role::DEPLOYER.id %>
+  external_id: 'google-3'
+  <<: *DEFAULTS

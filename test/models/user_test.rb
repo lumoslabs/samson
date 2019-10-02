@@ -250,6 +250,8 @@ describe User do
         "Deployer",
         "Deployer Project Admin",
         "DeployerBuddy",
+        "Environment Limited Deployer",
+        "Environment Limited Project Deployer",
         "Project Deployer",
         "Super Admin"
       ]
@@ -324,23 +326,52 @@ describe User do
     end
   end
 
-  describe "#deployer_for_project?" do
-    it "is true for a user that has been granted the role of project deployer" do
-      users(:project_deployer).deployer_for?(projects(:test)).must_equal(true)
+  describe "#deployer_for?" do
+    context 'when the user has been granted the role of project deployer' do
+      context 'when there are no environment role limitations' do
+        it "is true" do
+          users(:project_deployer).deployer_for?(projects(:test)).must_equal(true)
+        end
+      end
+      context 'when there are environment role limitations' do
+        it "is true" do
+          users(:environment_limited_project_deployer).deployer_for?(projects(:test), environments(:production)).must_equal(false)
+        end
+      end
     end
 
-    it "is true for a user that has been granted the role of project admin" do
-      users(:project_admin).deployer_for?(projects(:test)).must_equal(true)
+    context 'when the user has been granted the role of project admin' do
+      it "is true" do
+        users(:project_admin).deployer_for?(projects(:test)).must_equal(true)
+      end
     end
 
-    it "is false for users that have not been granted the roles of project deployer or project admin" do
-      users(:viewer).deployer_for?(projects(:test)).must_equal(false)
+    context 'when the user has not been granted the role of project deployer or project admin' do
+      context 'when there are no environment role limitations' do
+        it "is false" do
+          users(:viewer).deployer_for?(projects(:test)).must_equal(false)
+        end
+      end
+      context 'when there are environment role limitations placing you above viewer' do
+        it "is still false" do
+          users(:environment_limited_viewer).deployer_for?(projects(:test), environments(:production)).must_equal(false)
+        end
+      end
     end
 
-    it "is true for deployers" do
-      users(:deployer).deployer_for?(projects(:test)).must_equal(true)
-      users(:admin).deployer_for?(projects(:test)).must_equal(true)
-      users(:super_admin).deployer_for?(projects(:test)).must_equal(true)
+    context 'when the user is a global deployer' do
+      context 'when there are no environment role limitations' do
+        it "is true" do
+          users(:deployer).deployer_for?(projects(:test)).must_equal(true)
+          users(:admin).deployer_for?(projects(:test)).must_equal(true)
+          users(:super_admin).deployer_for?(projects(:test)).must_equal(true)
+        end
+      end
+      context 'when there are environment role limitations' do
+        it 'is false' do
+          users(:environment_limited_deployer).deployer_for?(projects(:test), environments(:production)).must_equal(true)
+        end
+      end
     end
   end
 

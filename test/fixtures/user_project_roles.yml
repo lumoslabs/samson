@@ -7,3 +7,8 @@ project_deployer:
   user: project_deployer
   project: test
   role_id: <%= Role::DEPLOYER.id %>
+
+environment_limited_project_deployer:
+  user: environment_limited_project_deployer
+  project: test
+  role_id: <%= Role::DEPLOYER.id %>

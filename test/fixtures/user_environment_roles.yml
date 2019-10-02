@@ -1,0 +1,14 @@
+environment_limited_project_deployer:
+  user: environment_limited_project_deployer
+  environment: production
+  role_id: <%= Role::VIEWER.id %>
+
+environment_limited_viewer:
+  user: environment_limited_viewer
+  environment: production
+  role_id: <%= Role::DEPLOYER.id %>
+
+environment_limited_deployer:
+  user: environment_limited_viewer
+  environment: production
+  role_id: <%= Role::VIEWER.id %>
