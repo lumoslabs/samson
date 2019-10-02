@@ -13,12 +13,7 @@ environment_viewer_global_deployer:
   environment: production
   role_id: <%= Role::VIEWER.id %>
 
-environment_deployer_global_admin:
-  user: environment_deployer_global_admin
+environment_deployer_global_deployer:
+  user: environment_deployer_global_deployer
   environment: production
   role_id: <%= Role::DEPLOYER.id %>
-
-environment_viewer_global_admin:
-  user: environment_viewer_global_admin
-  environment: production
-  role_id: <%= Role::VIEWER.id %>

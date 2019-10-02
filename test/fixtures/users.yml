@@ -66,30 +66,23 @@ environment_limited_project_deployer:
   external_id: 'github-5'
   <<: *DEFAULTS
 
-environment_deployer_global_admin:
-  name: "Environment Limited Admin"
-  email: "admin_limited@example.com"
-  role_id: <%= Role::ADMIN.id %>
+environment_deployer_global_deployer:
+  name: "Environment Deployer Global Deployer"
+  email: "deployer_limited_deployer@example.com"
+  role_id: <%= Role::DEPLOYER.id %>
   external_id: 'google-3'
   <<: *DEFAULTS
 
 environment_deployer_global_viewer:
-  name: "Environment Limited Viewer"
+  name: "Environment Deployer Global Viewer"
   email: "viewer_limited@example.com"
   role_id: <%= Role::VIEWER.id %>
   external_id: 'google-3'
   <<: *DEFAULTS
 
 environment_viewer_global_deployer:
-  name: "Environment Limited Deployer"
+  name: "Environment Viewer Global Deployer"
   email: "deployer_limited@example.com"
   role_id: <%= Role::DEPLOYER.id %>
-  external_id: 'google-3'
-  <<: *DEFAULTS
-
-environment_viewer_global_admin:
-  name: "Environment Limited Admin"
-  email: "admin_limited_to_viewer@example.com"
-  role_id: <%= Role::ADMIN.id %>
   external_id: 'google-3'
   <<: *DEFAULTS

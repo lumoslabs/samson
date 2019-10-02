@@ -250,8 +250,9 @@ describe User do
         "Deployer",
         "Deployer Project Admin",
         "DeployerBuddy",
-        "Environment Limited Deployer",
+        "Environment Deployer Global Deployer",
         "Environment Limited Project Deployer",
+        "Environment Viewer Global Deployer",
         "Project Deployer",
         "Super Admin"
       ]
@@ -354,7 +355,7 @@ describe User do
       end
       context 'when there are environment role limitations placing you above viewer' do
         it "is still false" do
-          users(:environment_limited_viewer).deployer_for?(projects(:test), environments(:production)).must_equal(false)
+          users(:environment_deployer_global_viewer).deployer_for?(projects(:test), environments(:production)).must_equal(false)
         end
       end
     end
@@ -369,7 +370,7 @@ describe User do
       end
       context 'when there are environment role limitations' do
         it 'is false' do
-          users(:environment_limited_deployer).deployer_for?(projects(:test), environments(:production)).must_equal(true)
+          users(:environment_viewer_global_deployer).deployer_for?(projects(:test), environments(:production)).must_equal(false)
         end
       end
     end
