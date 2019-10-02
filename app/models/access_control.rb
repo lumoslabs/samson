@@ -1,4 +1,3 @@
-require 'pry'
 # frozen_string_literal: true
 class AccessControl
   class << self
