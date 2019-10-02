@@ -591,8 +591,8 @@ describe Project do
 
   describe "#user_project_roles" do
     it "deletes them on deletion and audits as user change" do
-      assert_difference 'Audited::Audit.where(auditable_type: "User").count', +2 do
-        assert_difference 'UserProjectRole.count', -2 do
+      assert_difference 'Audited::Audit.where(auditable_type: "User").count', +3 do
+        assert_difference 'UserProjectRole.count', -3 do
           project.soft_delete!(validate: false)
         end
       end
