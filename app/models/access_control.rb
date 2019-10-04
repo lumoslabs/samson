@@ -25,7 +25,7 @@ class AccessControl
           end
         else raise ArgumentError, "Unsupported action #{action}"
         end
-      when :projects, :build_commands, :stages, :user_project_roles
+      when :projects, :build_commands, :stages, :user_project_roles, :user_environment_roles
         case action
         when :read then true
         when :write then user.admin_for?(scope)
@@ -61,7 +61,10 @@ class AccessControl
     private
 
     def can_deploy_anything?(user)
-      user.deployer? || user.user_project_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?
+      (user.deployer? ||
+        user.user_project_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?) &&
+        (user.user_environment_roles.empty? ||
+        user.user_environment_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?)
     end
 
     def can_lock_stage?(user, stage)

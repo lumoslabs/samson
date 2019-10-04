@@ -2,6 +2,7 @@
 ENV["RAILS_ENV"] = "test"
 
 require 'bundler/setup'
+require 'pry'
 
 # anything loaded before coverage will be uncovered
 require 'single_cov'

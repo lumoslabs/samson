@@ -4,9 +4,11 @@
   </button>
   <ul class="dropdown-menu" role="menu">
     <% stages.each do |stage| %>
-      <li>
-        <%= link_to_deploy_stage(stage, release) %>
-      </li>
+    <% if deployer_for_stage?(stage) %>
+        <li>
+          <%= link_to_deploy_stage(stage, release) %>
+        </li>
+    <% end %>
     <% end %>
   </ul>
 </div>

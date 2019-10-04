@@ -75,7 +75,7 @@ module ApplicationHelper
     case resource
     when Project, DeployGroup, Environment, User, Samson::Secrets::VaultServer then [resource.name, resource]
     when Command then ["Command ##{resource.id}", resource]
-    when UserProjectRole then ["Role for ##{resource.user.name}", resource.user]
+    when UserProjectRole, UserEnvironmentRole then ["Role for ##{resource.user.name}", resource.user]
     when Stage then
       name = resource.name
       name = (resource.lock.warning? ? warning_icon : lock_icon) + " " + name if resource.lock

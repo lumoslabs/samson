@@ -2,7 +2,7 @@
   <%= "#{@project.name} - Deploy ##{@deploy.id}" %>
 
   <div class="pull-right">
-    <% if deployer_for_project? %>
+    <% if deployer_for_stage?(@deploy.stage) %>
       <%= redeploy_button %>
 
       <% if @deploy.succeeded? && next_stage = @deploy.stage.next_stage %>

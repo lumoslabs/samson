@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 module StagesHelper
+  def deployer_for_stage?(stage)
+    current_user.deployer_for?(@project, stage.environments)
+  end
+
   def edit_command_link(command)
     title = (command.global? ? "Edit global command" : "Edit")
     icon = (command.global? ? "glyphicon-globe" : "glyphicon-edit")
