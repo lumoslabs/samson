@@ -2,7 +2,6 @@
 class UserEnvironmentRolesController < ApplicationController
   include CurrentEnvironment
 
-  # TODO: This is some CanCan shit, find out if we need to tweak something
   before_action :authorize_resource!
 
   def index

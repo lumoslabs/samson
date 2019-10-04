@@ -61,10 +61,10 @@ class AccessControl
     private
 
     def can_deploy_anything?(user)
-      user.deployer? ||
-        user.user_project_roles.where('role_id >= ?', Role::DEPLOYER.id).exists? ||
-        user.user_environment_roles.empty? ||
-        user.user_environment_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?
+      (user.deployer? ||
+        user.user_project_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?) &&
+        (user.user_environment_roles.empty? ||
+        user.user_environment_roles.where('role_id >= ?', Role::DEPLOYER.id).exists?)
     end
 
     def can_lock_stage?(user, stage)
