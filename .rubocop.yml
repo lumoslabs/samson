@@ -193,7 +193,7 @@ Style/IfInsideElse:
 Layout/AlignHash:
   Enabled: false
 
-Layout/AlignArguments:
+Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 
 # Opt-in
