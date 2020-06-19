@@ -19,7 +19,7 @@ group :preload do
 end
 
 gem 'bundler'
-gem 'dogstatsd-ruby'
+gem 'dogstatsd-ruby', '3.0.0'
 gem 'puma'
 gem 'attr_encrypted'
 gem 'sawyer'

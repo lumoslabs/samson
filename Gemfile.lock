@@ -305,7 +305,7 @@ GEM
       msgpack
     debug_inspector (0.0.3)
     diffy (3.3.0)
-    dogstatsd-ruby (4.8.1)
+    dogstatsd-ruby (3.0.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.4.0)
@@ -653,7 +653,7 @@ DEPENDENCIES
   connection_pool
   dalli
   diffy
-  dogstatsd-ruby
+  dogstatsd-ruby (= 3.0.0)
   doorkeeper
   dotenv
   faraday
