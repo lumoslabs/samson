@@ -5,7 +5,7 @@ ruby File.read('.ruby-version').strip
 
 # gems that have rails engines are are always needed
 group :preload do
-  gem 'rails', '6.0.2.1'
+  gem 'rails', '6.0.3.1'
   gem 'dotenv'
   gem 'connection_pool'
   gem 'marco-polo'
@@ -19,7 +19,7 @@ group :preload do
 end
 
 gem 'bundler'
-gem 'dogstatsd-ruby'
+gem 'dogstatsd-ruby', '3.0.0'
 gem 'puma'
 gem 'attr_encrypted'
 gem 'sawyer'
@@ -59,9 +59,9 @@ group :mysql do
   gem 'mysql2'
 end
 
-group :postgres do
-  gem 'pg'
-end
+# group :postgres do
+#   gem 'pg'
+# end
 
 group :sqlite do
   gem "sqlite3"
